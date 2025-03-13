@@ -1,4 +1,9 @@
 package controller;
+
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import dao.UserDAO;
 import model.User;
 import java.io.IOException;
@@ -28,6 +33,7 @@ public class LoginServlet extends HttpServlet {
             HttpSession session = request.getSession();
             session.setAttribute("username", user.getUserName());
             session.setAttribute("role", user.getRole());
+            session.setAttribute("user", user);
 
             // Debug kiểm tra role
             System.out.println("DEBUG: Đăng nhập thành công!");
@@ -35,7 +41,8 @@ public class LoginServlet extends HttpServlet {
 
             // Nếu là Admin -> Chuyển đến products (có quyền quản lý)
             // Nếu là User -> Cũng vào products nhưng không có quyền quản lý
-            response.sendRedirect("dashboard.jsp");
+//            response.sendRedirect("dashboard.jsp");
+            request.getRequestDispatcher("dashboard.jsp").forward(request, response);
         } else {
             System.out.println("DEBUG: Error!");
             response.sendRedirect("user/login.jsp?error=Invalid username or password");

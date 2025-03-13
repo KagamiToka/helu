@@ -38,6 +38,30 @@ public class Product {
     public int getStock() { return stock; }
     public Date getImportDate() { return importDate; }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setStock(int stock) {
+        this.stock = stock;
+    }
+
+    public void setImportDate(Date importDate) {
+        this.importDate = importDate;
+    }
+
     @Override
     public String toString() {
         return "Product{" + "id=" + id + ", name=" + name + ", price=" + price + ", description=" + description + ", stock=" + stock + ", importDate=" + importDate + '}';

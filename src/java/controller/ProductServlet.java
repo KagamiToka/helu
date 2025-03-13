@@ -1,4 +1,5 @@
 package controller;
+
 import dao.IProductDAO;
 import dao.ProductDAO;
 import model.Product;
@@ -10,31 +11,17 @@ import javax.servlet.http.*;
 
 @WebServlet("/products")
 public class ProductServlet extends HttpServlet {
-    private final IProductDAO productDAO = new ProductDAO(); // Sử dụng interface
+    private final IProductDAO productDAO = new ProductDAO();
+//    private final List<Product> allProducts = productDAO.getAllProducts();
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
         String role = (String) session.getAttribute("role");
         String action = request.getParameter("action");
-        
-        // Số sản phẩm trên mỗi trang
-//        int productsPerPage = 5;
-//        int page = 1;
-//
-//        if (request.getParameter("page") != null) {
-//            try {
-//                page = Integer.parseInt(request.getParameter("page"));
-//            } catch (NumberFormatException e) {
-//                page = 1; // Nếu lỗi, mặc định là trang 1
-//            }
-//        }
-//
-//        int offset = (page - 1) * productsPerPage;
-//        int totalProducts = productDAO.getTotalProducts();
-//        int totalPages = (int) Math.ceil((double) totalProducts / productsPerPage);
 
-        // CHẶN USER TRUY CẬP `CREATE`, `EDIT`, `DELETE`
+        List<Product> allProducts = productDAO.getAllProducts();
+        
         if ((action != null) && (action.equals("create") || action.equals("edit") || action.equals("delete"))) {
             if (role == null || !"admin".equals(role)) {
                 System.out.println("DEBUG: User do not allow, prevent connect " + action);
@@ -44,6 +31,18 @@ public class ProductServlet extends HttpServlet {
         }
 
         switch (action != null ? action : "") {
+            case "user":
+                String username = (String) session.getAttribute("username");
+                if (username == null) {
+                    System.out.println("DEBUG: Session expired, redirecting to login");
+                    response.sendRedirect(request.getContextPath() + "/user/login.jsp");
+                    return;
+                }
+                
+                System.out.println("DEBUG: Loaded " + allProducts.size() + " products for user: " + username);
+                request.setAttribute("allProducts", allProducts);
+                request.getRequestDispatcher("/user/listProductUser.jsp").forward(request, response);
+                break;
             case "create":
                 request.getRequestDispatcher("product/createProduct.jsp").forward(request, response);
                 break;
@@ -73,8 +72,8 @@ public class ProductServlet extends HttpServlet {
                 break;
 
             default:
-                List<Product> allProducts = productDAO.getAllProducts();
-                request.setAttribute("productList", allProducts);
+                System.out.println("DEBUG: ProductServlet loaded " + allProducts.size() + " products");
+                request.setAttribute("allProducts", allProducts);
                 request.getRequestDispatcher("product/listProduct.jsp").forward(request, response);
                 break;
         }
@@ -86,7 +85,6 @@ public class ProductServlet extends HttpServlet {
         String role = (String) session.getAttribute("role");
         String action = request.getParameter("action");
 
-        // Chặn User thực hiện các hành động Admin (Thêm, Sửa, Xóa)
         if (!"admin".equals(role)) {
             response.sendRedirect("products?error=notAdmin");
             return;
@@ -94,34 +92,24 @@ public class ProductServlet extends HttpServlet {
 
         switch (action) {
             case "add":
-                String name = request.getParameter("name");
-                String priceStr = request.getParameter("price");
-                String description = request.getParameter("description");
-                String stockStr = request.getParameter("stock");
-
-                System.out.println("DEBUG: Received data- Name: " + name + ", Price: " + priceStr + ", Description: " + description + ", Stock: " + stockStr);
-
-                if (name == null || priceStr == null || description == null || stockStr == null) {
-                    System.out.println("ERROR: Data not enough!");
-                    response.sendRedirect("products?error=missingData");
-                    return;
-                }
-
                 try {
-                    double price = Double.parseDouble(priceStr);
-                    int stock = Integer.parseInt(stockStr);
+                    int id = Integer.parseInt(request.getParameter("id"));
+                    String nameUpdate = request.getParameter("name");
+                    double priceUpdate = Double.parseDouble(request.getParameter("price"));
+                    String descriptionUpdate = request.getParameter("description");
+                    int stockUpdate = Integer.parseInt(request.getParameter("stock"));
 
-                    boolean success = productDAO.insertProduct(new Product(name, price, description, stock, null));
+                    boolean success = productDAO.updateProduct(new Product(id, nameUpdate, priceUpdate, descriptionUpdate, stockUpdate, null));
                     if (success) {
-                        System.out.println("DEBUG: Add successfull!");
-                        response.sendRedirect("products?success=added");
+                        response.sendRedirect("products?success=updated");
                     } else {
-                        System.out.println("ERROR: Add fail!");
-                        response.sendRedirect("products?error=addFailed");
+                        response.sendRedirect("products?error=updateFailed");
                     }
                 } catch (NumberFormatException e) {
-                    System.out.println("ERROR: Error change type of data!");
                     response.sendRedirect("products?error=invalidData");
+                } catch (Exception e) {
+                    System.out.println("DEBUG: Update failed: " + e.getMessage());
+                    response.sendRedirect("products?error=updateFailed");
                 }
                 break;
 

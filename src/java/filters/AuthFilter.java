@@ -19,6 +19,12 @@ public class AuthFilter implements Filter {
         HttpSession session = req.getSession(false);
 
         String role = (session != null) ? (String) session.getAttribute("role") : null;
+//        String role = session;
+//        if(session != null){
+//            session.getAttribute("role");
+//        }else {
+//            return null;
+//        }
         String path = req.getRequestURI();
         String action = req.getParameter("action");
 

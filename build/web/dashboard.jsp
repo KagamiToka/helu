@@ -13,18 +13,80 @@
 <head>
     <meta charset="UTF-8">
     <title>Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            padding: 20px;
+            color: white;
+            position: fixed;
+            height: 100%;
+        }
+        
+        .sidebar h2 {
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        
+        .sidebar a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .sidebar a:hover {
+            background-color: #34495e;
+        }
+        
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+        }
+        
+        .logout {
+            position: absolute;
+            bottom: 20px;
+            width: 210px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Chào mừng, <%= username %>!</h2>
+    <div class="sidebar">
+        <h2>Chào mừng, <%= username %>!</h2>
+        
+        <% if ("admin".equals(role)) { %>
+            <a href="user/listUser.jsp">Quản lý Người Dùng</a>
+            <a href="product/listProduct.jsp">Quản lý Sản Phẩm</a>
+        <% } else { %>
+            <a href="user/listProductUser.jsp">Xem Sản Phẩm</a>
+            <a href="cart/cart.jsp">Giỏ Hàng</a>
+        <% } %>
+        
+        <a href="user/logout.jsp" class="logout">Đăng Xuất</a>
+    </div>
     
-    <% if ("admin".equals(role)) { %>
-        <a href="user/userList.jsp">Quản lý Người Dùng</a><br>
-        <a href="product/listProduct.jsp">Quản lý Sản Phẩm</a><br>
-    <% } else { %>
-        <a href="product/listProduct.jsp">Xem Sản Phẩm</a><br>
-        <a href="cart.jsp">Giỏ Hàng</a><br>
-    <% } %>
-    
-    <a href="user/logout.jsp">Đăng Xuất</a>
+    <div class="content">
+        <!-- Nội dung chính sẽ hiển thị ở đây -->
+        <h1>Dashboard</h1>
+        <p>Chào mừng bạn đến với hệ thống quản lý.</p>
+    </div>
 </body>
 </html>
